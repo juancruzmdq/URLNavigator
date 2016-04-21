@@ -65,6 +65,12 @@ public class URLNavigator {
 
     /// A dictionary to store URLOpenHandlers by URL patterns.
     private(set) var URLOpenHandlers = [String: URLOpenHandler]()
+    
+    /// A dictionary to store URLNaviables by URL patterns.
+    private(set) var URLCommands = [String: URLCommand]()
+
+    /// Reference to the main window of the app
+    public var rootWindow:UIWindow?
 
 
     // MARK: Initializing
@@ -101,6 +107,11 @@ public class URLNavigator {
         self.URLOpenHandlers[URLString] = handler
     }
 
+    /// Map an `URLCommand` to an URL pattern.
+    public func map(URLPattern: URLConvertible, _ command: URLCommandBase) {
+        let URLString = URLNavigator.normalizedURL(URLPattern).URLStringValue
+        self.URLCommands[URLString] = command
+    }
 
     // MARK: Matching URLs
 
@@ -169,6 +180,31 @@ public class URLNavigator {
     }
 
 
+    
+    public func handle(URL: URLConvertible,
+                        from: UIViewController? = nil,
+                        wrap:Bool = false,
+                        animated:Bool = true)  -> UIViewController?{
+        if let (URLPattern, values) = URLNavigator.matchURL(URL, from: Array(self.URLCommands.keys)) {
+            
+            let navigationController = from ?? UIViewController.topMostViewController()?.navigationController
+            
+            let context:URLNavigationContext = URLNavigationContext()
+            context.values = values
+            context.URL = URL
+            context.presenter = navigationController
+            context.wrap = wrap
+            context.animated = animated
+            context.window = rootWindow
+            
+            let command:URLCommand = self.URLCommands[URLPattern]!
+            
+            return command.execute(context) as? UIViewController
+        }
+        return nil
+    }
+
+    
     // MARK: Pushing View Controllers with URL
 
     /// Pushes a view controller using `UINavigationController.pushViewController()`.

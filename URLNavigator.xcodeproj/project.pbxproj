@@ -15,6 +15,7 @@
 		03107EF01C636A3D00DF2F14 /* URLNavigator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 03107ECE1C6362E800DF2F14 /* URLNavigator.framework */; };
 		03107EF91C636A7500DF2F14 /* URLNavigatorInternalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03107EF71C636A5500DF2F14 /* URLNavigatorInternalTests.swift */; };
 		03107EFC1C67289100DF2F14 /* URLNavigatorPublicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03107EFA1C67288400DF2F14 /* URLNavigatorPublicTests.swift */; };
+		EEEF64A61CC917940099637E /* URLCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEF64A51CC917940099637E /* URLCommand.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		03107EEB1C636A3D00DF2F14 /* URLNavigatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = URLNavigatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		03107EF71C636A5500DF2F14 /* URLNavigatorInternalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLNavigatorInternalTests.swift; sourceTree = "<group>"; };
 		03107EFA1C67288400DF2F14 /* URLNavigatorPublicTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLNavigatorPublicTests.swift; sourceTree = "<group>"; };
+		EEEF64A51CC917940099637E /* URLCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLCommand.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 				03107EE11C6365BF00DF2F14 /* URLNavigable.swift */,
 				03107EE31C6365E500DF2F14 /* URLConvertible.swift */,
 				03107EE51C6366F500DF2F14 /* UIViewController+TopMostViewController.swift */,
+				EEEF64A51CC917940099637E /* URLCommand.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -216,6 +219,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				03107EE61C6366F500DF2F14 /* UIViewController+TopMostViewController.swift in Sources */,
+				EEEF64A61CC917940099637E /* URLCommand.swift in Sources */,
 				03107EE01C63653900DF2F14 /* URLNavigator.swift in Sources */,
 				03107EE41C6365E500DF2F14 /* URLConvertible.swift in Sources */,
 				03107EE21C6365BF00DF2F14 /* URLNavigable.swift in Sources */,

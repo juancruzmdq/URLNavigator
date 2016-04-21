@@ -37,6 +37,8 @@ class URLNavigatorPublicTests: XCTestCase {
     }
 
     func testViewControllerForURL() {
+        
+        
         self.navigator.map("myapp://user/<int:id>", UserViewController.self)
         self.navigator.map("myapp://post/<title>", PostViewController.self)
         self.navigator.map("http://<path:_>", WebViewController.self)
@@ -57,8 +59,54 @@ class URLNavigatorPublicTests: XCTestCase {
         XCTAssert(self.navigator.viewControllerForURL("http://google.com/search?q=URLNavigator") is WebViewController)
         XCTAssert(self.navigator.viewControllerForURL("http://google.com/search?q=URLNavigator") is WebViewController)
         XCTAssert(self.navigator.viewControllerForURL("http://google.com/search/?q=URLNavigator") is WebViewController)
+        
+    }
+    
+    func testBlockCommands(){
+        var int = 0
+        
+        self.navigator.map("myapp://user/<int:id>", URLBlockCommand({ (URL, values) in
+            int = values["id"] as! Int
+        }))
+        
+        self.navigator.handle("myapp://user/12")
+        XCTAssert(int == 12)
+    }
+    
+    func testPushCommands(){
+        self.navigator.map("myapp://post/<title>", URLPushCommand(URLNavigableBuilderWithClass(PostViewController.self)))
+        
+        let navigationController = UINavigationController(rootViewController: UIViewController())
+        let viewController = self.navigator.handle("myapp://post/hello", from: navigationController, animated:false)
+        XCTAssert(viewController is PostViewController)
+        XCTAssert((viewController as! PostViewController).postTitle == "hello")
+        XCTAssertEqual(navigationController.viewControllers.count, 2)
+        XCTAssert(navigationController.topViewController is PostViewController)
+    }
+    
+    func testPresentCommands(){
+        self.navigator.map("myapp://post/<title>", URLPresentCommand(URLNavigableBuilderWithClass(PostViewController.self)))
+        
+        let rootViewController = UIViewController()
+        
+        let viewController = self.navigator.handle("myapp://post/hello", from: rootViewController, animated:false)
+        XCTAssert(viewController is PostViewController)
+        XCTAssert((viewController as! PostViewController).postTitle == "hello")
+    }
+    
+    func testMakeRoot() {
+        let window: UIWindow = UIWindow()
+        window.rootViewController = UIViewController()
+        
+        self.navigator.rootWindow = window
+        self.navigator.map("myapp://user/<int:id>", URLMakeRootCommand(URLNavigableBuilderWithClass(UserViewController.self)))
+        let viewController = self.navigator.handle("myapp://user/1")
+
+        XCTAssertNotNil(viewController)
+        XCTAssert(window.rootViewController is UserViewController)
     }
 
+    
     func testPushURL_URLNavigable() {
         self.navigator.map("myapp://user/<int:id>", UserViewController.self)
         let navigationController = UINavigationController(rootViewController: UIViewController())
