@@ -84,6 +84,21 @@ class URLNavigatorPublicTests: XCTestCase {
         XCTAssert(navigationController.topViewController is PostViewController)
     }
     
+    func testCommandOVerride(){
+        self.navigator.map("myapp://user/<int:id>", URLPushCommand(URLNavigableBuilderWithClass(PostViewController.self)))
+        
+        let navigationController = UINavigationController(rootViewController: UIViewController())
+        
+        var int = 0
+        let viewController = self.navigator.handle("myapp://user/12",command: URLBlockCommand({ (URL, values) in
+            int = values["id"] as! Int
+        }))
+        XCTAssert(int == 12)
+
+        XCTAssertNil(viewController)
+        XCTAssertEqual(navigationController.viewControllers.count, 1)
+    }
+    
     func testPresentCommands(){
         self.navigator.map("myapp://post/<title>", URLPresentCommand(URLNavigableBuilderWithClass(PostViewController.self)))
         

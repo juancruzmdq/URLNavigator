@@ -17,9 +17,9 @@ import Foundation
  *  URLContext
  */
 
-protocol URLContext {
-    var URL:URLConvertible? { get set }
-    var values:[String: AnyObject]? { get set }
+public protocol URLContext {
+    var URL:URLConvertible { get set }
+    var values:[String: AnyObject] { get set }
     var wrap:Bool { get set }
     var animated : Bool { get set }
     var presenter:UIViewController? { get set }
@@ -27,12 +27,17 @@ protocol URLContext {
 }
 
 public class URLNavigationContext:URLContext{
-    public var URL:URLConvertible?
-    public var values:[String: AnyObject]?
+    public var URL:URLConvertible
+    public var values:[String: AnyObject]
     public var wrap: Bool = false
     public var animated : Bool = true
     public var presenter:UIViewController?
     public var window:UIWindow?
+    
+    public init(URL:URLConvertible, values:[String: AnyObject]){
+        self.URL = URL
+        self.values = values
+    }
 }
 
 /**
@@ -89,12 +94,12 @@ public class URLNavigableBuilderWithBlock:URLNavigableBuilder{
  *  URLCommand
  */
 
-protocol URLCommand {
+public protocol URLCommand {
     func execute(context:URLContext) -> URLNavigable?
 }
 
 public class URLCommandBase:URLCommand{
-    func execute(context:URLContext) -> URLNavigable?{
+    public func execute(context:URLContext) -> URLNavigable?{
         fatalError("Subclasses need to implement the `execute(context:URLContext)` method.")
     }
 }
@@ -116,9 +121,8 @@ public class URLBlockCommand:URLCommandBase{
         self.blockHandler = block
     }
     
-    override func execute(context:URLContext) -> URLNavigable?{
-        // should check if exist
-        self.blockHandler(URL:context.URL!, values:context.values!)
+    override public func execute(context:URLContext) -> URLNavigable?{
+        self.blockHandler(URL:context.URL, values:context.values)
         return nil
     }
     
@@ -126,37 +130,84 @@ public class URLBlockCommand:URLCommandBase{
 
 public class URLPushCommand:URLNavigationCommand{
 
-    override func execute(context:URLContext) -> URLNavigable?{
+    override public func execute(context:URLContext) -> URLNavigable?{
         // should check if exist
-        let dest:URLNavigable = (self.destinationBuilder.buildNavigable(context.URL!, values: context.values!))
-        (context.presenter as? UINavigationController)!.pushViewController(dest as! UIViewController, animated: context.animated)
-        return dest
+        var navigationController:UINavigationController?
+        
+        // Try tu use the navigator in the context
+        if context.presenter != nil && context.presenter is UINavigationController {
+            navigationController = context.presenter as? UINavigationController
+        }
+        
+        // if there are no navigator in the context, try to deduce it
+        if navigationController == nil{
+            navigationController = UIViewController.topMostViewController()?.navigationController
+        }
+        
+        if navigationController != nil {
+            // Build destination ViewController
+            let dest:URLNavigable = (self.destinationBuilder.buildNavigable(context.URL, values: context.values))
+            
+            // Try to push it
+            navigationController?.pushViewController(dest as! UIViewController, animated: context.animated)
+            
+            return dest
+        }
+        
+        return nil
     }
 }
 
 public class URLPresentCommand:URLNavigationCommand{
     
-    override func execute(context:URLContext) -> URLNavigable?{
+    override public func execute(context:URLContext) -> URLNavigable?{
         // should check if exist
-        let dest:URLNavigable = (self.destinationBuilder.buildNavigable(context.URL!, values: context.values!))
-        context.presenter?.presentViewController(dest as! UIViewController, animated: context.animated, completion: nil)
-        return dest
+        var controller:UIViewController?
+        
+        // Try tu use the navigator in the context
+        if context.presenter != nil {
+            controller = context.presenter
+        }
+        
+        // if there are no navigator in the context, try to deduce it
+        if controller == nil{
+            controller = UIViewController.topMostViewController()
+        }
+        
+        if controller != nil {
+            // Build destination ViewController
+            guard let buildedController:URLNavigable? = self.destinationBuilder.buildNavigable(context.URL, values: context.values) else{
+                return nil
+            }
+            
+            // Try to Present it
+            controller?.presentViewController(buildedController as! UIViewController, animated: context.animated, completion: nil)
+            
+            return buildedController
+        }
+        
+        return nil
     }
 }
 
 public class URLMakeRootCommand:URLNavigationCommand{
     
-    override func execute(context:URLContext) -> URLNavigable?{
-        // should check if exist
-        let buildedController = self.destinationBuilder.buildNavigable(context.URL!, values: context.values!)
+    override public func execute(context:URLContext) -> URLNavigable?{
+        // build destination conroller
+        guard let buildedController:URLNavigable? = self.destinationBuilder.buildNavigable(context.URL, values: context.values) else{
+            return nil
+        }
         
+        // By default present the builded controller
         var presentController:UIViewController = buildedController as! UIViewController
         
+        // If need to wrap it, create and present the navigation bar
         if context.wrap && !presentController.isKindOfClass(UINavigationController){
             let navigationController = UINavigationController(rootViewController: presentController)
             presentController = navigationController
         }
         
+        // create snapshot to make animated transition
         let snapShot:UIView = context.window!.snapshotViewAfterScreenUpdates(true)
         
         presentController.view.addSubview(snapShot)

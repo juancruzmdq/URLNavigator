@@ -180,28 +180,45 @@ public class URLNavigator {
     }
 
 
-    
+    /**
+     Execute the command specified for the URL
+     
+     - parameter URL:      URL string to analize
+     - parameter command:  instance of URLCommand, if the user send it, this command will override the configured command for the pattern
+     - parameter from:     UIViewController that will be used to perform the command
+     - parameter wrap:     if true, encapsulate in a UINavigationBar the final ViewController
+     - parameter animated: Animate command execution
+     
+     - returns: Instance of the created UIViewController
+     */
     public func handle(URL: URLConvertible,
-                        from: UIViewController? = nil,
-                        wrap:Bool = false,
-                        animated:Bool = true)  -> UIViewController?{
-        if let (URLPattern, values) = URLNavigator.matchURL(URL, from: Array(self.URLCommands.keys)) {
-            
-            let navigationController = from ?? UIViewController.topMostViewController()?.navigationController
-            
-            let context:URLNavigationContext = URLNavigationContext()
-            context.values = values
-            context.URL = URL
-            context.presenter = navigationController
-            context.wrap = wrap
-            context.animated = animated
-            context.window = rootWindow
-            
-            let command:URLCommand = self.URLCommands[URLPattern]!
-            
-            return command.execute(context) as? UIViewController
+                       command: URLCommand? = nil,
+                       from: UIViewController? = nil,
+                       wrap:Bool = false,
+                       animated:Bool = true)  -> UIViewController?{
+        
+        // Return the pattern and the parameters that mach the url to execute
+        guard let (URLPattern, values) = URLNavigator.matchURL(URL, from: Array(self.URLCommands.keys)) else{
+            return nil
         }
-        return nil
+        
+        // Build a context to execute the selected command
+        let context:URLNavigationContext = URLNavigationContext(URL: URL, values: values)
+        context.presenter = from
+        context.wrap = wrap
+        context.animated = animated
+        context.window = rootWindow
+        
+        // If the user send a custom command, use it and ignored the command setted for this url pattern
+        var finalCommand:URLCommand? = command
+        
+        // if the user didn't send a custom command, search the command specify for this pattern
+        if finalCommand  == nil {
+            finalCommand = self.URLCommands[URLPattern]!
+        }
+        
+        // execute command with the specified context
+        return finalCommand!.execute(context) as? UIViewController
     }
 
     
