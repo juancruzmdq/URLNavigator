@@ -127,7 +127,7 @@ public class URLNavigator {
 
     /// Map an `URLCommand` to an URL pattern.
     public func map(URLPattern: URLConvertible, _ command: URLCommandBase) {
-        let URLString = URLNavigator.normalizedURL(URLPattern).URLStringValue
+        let URLString = URLNavigator.normalizedURL(URLPattern, scheme: self.scheme).URLStringValue
         self.URLCommands[URLString] = command
     }
 
