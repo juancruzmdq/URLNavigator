@@ -65,7 +65,7 @@ public class URLNavigableBuilderWithStoryboard:URLNavigableBuilder{
     let storyboard:String
     let viewIdentifier:String
     
-    public init(storyboard:String,viewIdentifier:String){
+    public init(_ storyboard:String,viewIdentifier:String){
         self.storyboard = storyboard
         self.viewIdentifier = viewIdentifier
     }
@@ -80,7 +80,7 @@ public class URLNavigableBuilderWithStoryboard:URLNavigableBuilder{
 public class URLNavigableBuilderWithBlock:URLNavigableBuilder{
     let builderBlock:(URL: URLConvertible, values: [String: AnyObject]) -> URLNavigable
     
-    public init(builderBlock:(URL: URLConvertible, values: [String: AnyObject]) -> URLNavigable){
+    public init(_ builderBlock:(URL: URLConvertible, values: [String: AnyObject]) -> URLNavigable){
         self.builderBlock = builderBlock
     }
 
@@ -88,6 +88,22 @@ public class URLNavigableBuilderWithBlock:URLNavigableBuilder{
         return self.builderBlock(URL:URL, values: values)
     }
 }
+
+public class URLNavigableBuilderFactory{
+    
+    public static func getBuilder(navigable: URLNavigable.Type) -> URLNavigableBuilder {
+        return URLNavigableBuilderWithClass(navigable)
+    }
+    
+    public static func getBuilder(storyboard:String,viewIdentifier:String) -> URLNavigableBuilder{
+        return URLNavigableBuilderWithStoryboard(storyboard,viewIdentifier: viewIdentifier)
+    }
+    
+    public static func getBuilder(builderBlock:(URL: URLConvertible, values: [String: AnyObject]) -> URLNavigable) -> URLNavigableBuilder{
+        return URLNavigableBuilderWithBlock(builderBlock)
+    }
+}
+
 
 
 /**
@@ -180,8 +196,17 @@ public class URLCommandNavigationPresent:URLCommandNavigation{
                 return nil
             }
             
+            // By default present the builded controller
+            var presentController:UIViewController = buildedController as! UIViewController
+            
+            // If need to wrap it, create and present the navigation bar
+            if context.wrap && !presentController.isKindOfClass(UINavigationController){
+                let navigationController = UINavigationController(rootViewController: presentController)
+                presentController = navigationController
+            }
+            
             // Try to Present it
-            controller?.presentViewController(buildedController as! UIViewController, animated: context.animated, completion: nil)
+            controller?.presentViewController(presentController, animated: context.animated, completion: nil)
             
             return buildedController
         }
