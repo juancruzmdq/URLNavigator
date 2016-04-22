@@ -116,7 +116,7 @@ class URLNavigatorPublicTests: XCTestCase {
         let window: UIWindow = UIWindow()
         window.rootViewController = UIViewController()
         
-        self.navigator.rootWindow = window
+        self.navigator.window = window
         self.navigator.map("myapp://user/<int:id>", URLCommandNavigationMakeRoot(URLNavigableBuilderWithClass(UserViewController.self)))
         let viewController = self.navigator.handle("myapp://user/1")
 

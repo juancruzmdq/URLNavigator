@@ -70,7 +70,7 @@ public class URLNavigator {
     private(set) var URLCommands = [String: URLCommand]()
 
     /// Reference to the main window of the app
-    public var rootWindow:UIWindow?
+    public var window:UIWindow?
 
     /// A default scheme. If this value is set, it's available to map URL paths without schemes.
     ///
@@ -224,7 +224,7 @@ public class URLNavigator {
                        animated:Bool = true)  -> UIViewController?{
         
         // Return the pattern and the parameters that mach the url to execute
-        guard let (URLPattern, values) = URLNavigator.matchURL(URL, from: Array(self.URLCommands.keys)) else{
+        guard let (URLPattern, values) = URLNavigator.matchURL(URL, scheme: self.scheme, from: Array(self.URLCommands.keys)) else{
             return nil
         }
         
@@ -233,7 +233,7 @@ public class URLNavigator {
         context.presenter = from
         context.wrap = wrap
         context.animated = animated
-        context.window = rootWindow
+        context.window = window
         
         // If the user send a custom command, use it and ignored the command setted for this url pattern
         var finalCommand:URLCommand? = command
