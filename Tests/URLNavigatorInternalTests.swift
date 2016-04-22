@@ -97,7 +97,7 @@ class URLNavigatorInternalTests: XCTestCase {
             let from = ["myapp://alert"]
             let (URLPattern, values) = URLNavigator.matchURL("myapp://alert?title=hello&message=world", from: from)!
             XCTAssertEqual(URLPattern, "myapp://alert")
-            XCTAssertEqual(values.count, 0)
+            XCTAssertEqual(values.count, 2)
 
             let scheme = URLNavigator.matchURL("/alert?title=hello&message=world", scheme: "myapp", from: from)!
             XCTAssertEqual(URLPattern, scheme.0)
@@ -127,7 +127,7 @@ class URLNavigatorInternalTests: XCTestCase {
             let from = ["http://<path:url>"]
             let (URLPattern, values) = URLNavigator.matchURL("http://google.com/search?q=URLNavigator", from: from)!
             XCTAssertEqual(URLPattern, "http://<path:url>")
-            XCTAssertEqual(values as! [String: String], ["url": "google.com/search"])
+            XCTAssertEqual(values as! [String: String], ["url": "google.com/search","q":"URLNavigator"])
 
             let scheme = URLNavigator.matchURL("http://google.com/search?q=URLNavigator", scheme: "myapp", from: from)!
             XCTAssertEqual(URLPattern, scheme.0)
@@ -137,7 +137,7 @@ class URLNavigatorInternalTests: XCTestCase {
             let from = ["http://<path:url>"]
             let (URLPattern, values) = URLNavigator.matchURL("http://google.com/search/?q=URLNavigator", from: from)!
             XCTAssertEqual(URLPattern, "http://<path:url>")
-            XCTAssertEqual(values as! [String: String], ["url": "google.com/search"])
+            XCTAssertEqual(values as! [String: String], ["url": "google.com/search","q":"URLNavigator"])
 
             let scheme = URLNavigator.matchURL("http://google.com/search/?q=URLNavigator",
                                                scheme: "myapp", from: from)!
