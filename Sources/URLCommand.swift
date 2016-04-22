@@ -26,7 +26,7 @@ public protocol URLContext {
     var window:UIWindow? { get set }
 }
 
-public class URLNavigationContext:URLContext{
+public class URLContextNavigation:URLContext{
     public var URL:URLConvertible
     public var values:[String: AnyObject]
     public var wrap: Bool = false
@@ -104,14 +104,14 @@ public class URLCommandBase:URLCommand{
     }
 }
 
-public class URLNavigationCommand:URLCommandBase{
+public class URLCommandNavigation:URLCommandBase{
     var destinationBuilder:URLNavigableBuilder
     public init(_ destinationBuilder:URLNavigableBuilder) {
         self.destinationBuilder = destinationBuilder
     }
 }
 
-public class URLBlockCommand:URLCommandBase{
+public class URLCommandBlock:URLCommandBase{
     
     public typealias URLBlockCommandHandler = (URL: URLConvertible, values: [String: AnyObject]) -> Void
 
@@ -128,7 +128,7 @@ public class URLBlockCommand:URLCommandBase{
     
 }
 
-public class URLPushCommand:URLNavigationCommand{
+public class URLCommandNavigationPush:URLCommandNavigation{
 
     override public func execute(context:URLContext) -> URLNavigable?{
         // should check if exist
@@ -158,7 +158,7 @@ public class URLPushCommand:URLNavigationCommand{
     }
 }
 
-public class URLPresentCommand:URLNavigationCommand{
+public class URLCommandNavigationPresent:URLCommandNavigation{
     
     override public func execute(context:URLContext) -> URLNavigable?{
         // should check if exist
@@ -190,7 +190,7 @@ public class URLPresentCommand:URLNavigationCommand{
     }
 }
 
-public class URLMakeRootCommand:URLNavigationCommand{
+public class URLCommandNavigationMakeRoot:URLCommandNavigation{
     
     override public func execute(context:URLContext) -> URLNavigable?{
         // build destination conroller

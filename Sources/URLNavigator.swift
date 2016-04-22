@@ -222,7 +222,7 @@ public class URLNavigator {
         }
         
         // Build a context to execute the selected command
-        let context:URLNavigationContext = URLNavigationContext(URL: URL, values: values)
+        let context:URLContextNavigation = URLContextNavigation(URL: URL, values: values)
         context.presenter = from
         context.wrap = wrap
         context.animated = animated

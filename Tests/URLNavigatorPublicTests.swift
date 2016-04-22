@@ -65,7 +65,7 @@ class URLNavigatorPublicTests: XCTestCase {
     func testBlockCommands(){
         var int = 0
         
-        self.navigator.map("myapp://user/<int:id>", URLBlockCommand({ (URL, values) in
+        self.navigator.map("myapp://user/<int:id>", URLCommandBlock({ (URL, values) in
             int = values["id"] as! Int
         }))
         
@@ -74,7 +74,7 @@ class URLNavigatorPublicTests: XCTestCase {
     }
     
     func testPushCommands(){
-        self.navigator.map("myapp://post/<title>", URLPushCommand(URLNavigableBuilderWithClass(PostViewController.self)))
+        self.navigator.map("myapp://post/<title>", URLCommandNavigationPush(URLNavigableBuilderWithClass(PostViewController.self)))
         
         let navigationController = UINavigationController(rootViewController: UIViewController())
         let viewController = self.navigator.handle("myapp://post/hello", from: navigationController, animated:false)
@@ -85,12 +85,12 @@ class URLNavigatorPublicTests: XCTestCase {
     }
     
     func testCommandOVerride(){
-        self.navigator.map("myapp://user/<int:id>", URLPushCommand(URLNavigableBuilderWithClass(PostViewController.self)))
+        self.navigator.map("myapp://user/<int:id>", URLCommandNavigationPush(URLNavigableBuilderWithClass(PostViewController.self)))
         
         let navigationController = UINavigationController(rootViewController: UIViewController())
         
         var int = 0
-        let viewController = self.navigator.handle("myapp://user/12",command: URLBlockCommand({ (URL, values) in
+        let viewController = self.navigator.handle("myapp://user/12",command: URLCommandBlock({ (URL, values) in
             int = values["id"] as! Int
         }))
         XCTAssert(int == 12)
@@ -100,7 +100,7 @@ class URLNavigatorPublicTests: XCTestCase {
     }
     
     func testPresentCommands(){
-        self.navigator.map("myapp://post/<title>", URLPresentCommand(URLNavigableBuilderWithClass(PostViewController.self)))
+        self.navigator.map("myapp://post/<title>", URLCommandNavigationPresent(URLNavigableBuilderWithClass(PostViewController.self)))
         
         let rootViewController = UIViewController()
         
@@ -114,7 +114,7 @@ class URLNavigatorPublicTests: XCTestCase {
         window.rootViewController = UIViewController()
         
         self.navigator.rootWindow = window
-        self.navigator.map("myapp://user/<int:id>", URLMakeRootCommand(URLNavigableBuilderWithClass(UserViewController.self)))
+        self.navigator.map("myapp://user/<int:id>", URLCommandNavigationMakeRoot(URLNavigableBuilderWithClass(UserViewController.self)))
         let viewController = self.navigator.handle("myapp://user/1")
 
         XCTAssertNotNil(viewController)
